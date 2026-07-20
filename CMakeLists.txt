@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(PluginMinecraft)
+
 set(SHADOWHOOK_MODE "shared")
+
 add_subdirectory(
-    shadowhook/src/main/cpp
+    shadowhook/shadowhook/src/main/cpp
     shadowhook-build
 )
 
@@ -16,7 +18,7 @@ add_library(PluginMinecraft SHARED
 
 target_include_directories(PluginMinecraft PRIVATE
     imgui
-    shadowhook/src/main/cpp/include
+    shadowhook/shadowhook/src/main/cpp/include
 )
 
 target_link_libraries(PluginMinecraft
