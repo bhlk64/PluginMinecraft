@@ -10,7 +10,13 @@
 void DrawGUI()
 {
   LOGI("DrawGUI called");
-  glClearColor(1,0,0,1);
+  glClearColor(1, 0, 0, 1);
+  glClear(GL_COLOR_BUFFER_BIT);
+  LOGI("glError = %x", glGetError());
+  LOGI("context = %p", eglGetCurrentContext());
+  ImGuiIO& io = ImGui::GetIO();
+  LOGI("Display = %.1f %.1f", io.DisplaySize.x, io.DisplaySize.y);
+
 
   static bool initialized = false;
 
