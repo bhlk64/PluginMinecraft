@@ -1,7 +1,8 @@
 #include <android/log.h>
 #include <EGL/egl.h>
+#include <dlfcn.h>
 
-#include "shadowhook.h"
+#include "And64InlineHook.hpp"
 #include "gui.h"
 
 #define LOG_TAG "PluginMinecraft"
@@ -15,7 +16,6 @@ typedef EGLBoolean (*eglSwapBuffers_t)(
 
 
 static eglSwapBuffers_t orig_eglSwapBuffers = nullptr;
-static void *eglSwapBuffers_stub = nullptr;
 
 
 EGLBoolean hook_eglSwapBuffers(
@@ -42,35 +42,33 @@ static void init()
 {
   LOGI("libplugin.so loaded!");
 
-  shadowhook_init(
-    SHADOWHOOK_MODE_UNIQUE,
-    false
+  void *egl = dlopen(
+    "libEGL.so",
+    RTLD_NOW
   );
 
+  if (!egl)
+  {
+    LOGI("failed to load libEGL.so");
+    return;
+  }
 
-  void *addr = shadowhook_dlsym(
-    "libEGL.so",
+
+  void *addr = dlsym(
+    egl,
     "eglSwapBuffers"
   );
 
 
   if (addr)
   {
-    eglSwapBuffers_stub = shadowhook_hook_func_addr(
+    A64HookFunction(
       addr,
       (void *)hook_eglSwapBuffers,
       (void **)&orig_eglSwapBuffers
     );
 
-
-    if (eglSwapBuffers_stub)
-    {
-      LOGI("eglSwapBuffers hooked!");
-    }
-    else
-    {
-      LOGI("hook failed");
-    }
+    LOGI("eglSwapBuffers hooked!");
   }
   else
   {
