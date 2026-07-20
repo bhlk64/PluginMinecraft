@@ -37,7 +37,7 @@ void DrawGUI()
   io.DisplaySize = ImVec2((float)w, (float)h);
   io.Fonts->AddFontDefault();
   
-  LOGI("Display = %d %d", w, h);
+  //LOGI("Display = %d %d", w, h);
   ImGui_ImplOpenGL3_NewFrame();
 
   ImGui::NewFrame();
