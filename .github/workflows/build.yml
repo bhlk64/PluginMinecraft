@@ -1,0 +1,51 @@
+name: Build roblox in minecraft
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        abi:
+          - arm64-v8a
+          - armeabi-v7a
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Android NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;27.2.12479018"
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build/${{ matrix.abi }} \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_HOME/ndk/27.2.12479018/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=${{ matrix.abi }} \
+            -DANDROID_PLATFORM=android-24
+
+      - name: Build
+        run: |
+          cmake --build build/${{ matrix.abi }} --config Release
+
+      - name: Upload .so
+        uses: actions/upload-artifact@v4
+        with:
+          name: lib-${{ matrix.abi }}
+          path: build/${{ matrix.abi }}/**/*.so
