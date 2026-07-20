@@ -23,17 +23,16 @@ EGLBoolean hook_eglSwapBuffers(
   EGLSurface surface
 )
 {
-  DrawGUI();
+  static int count = 0;
 
-  if (orig_eglSwapBuffers)
+  if (count++ % 60 == 0)
   {
-    return orig_eglSwapBuffers(
-      display,
-      surface
-    );
+    LOGI("eglSwapBuffers frame");
   }
 
-  return EGL_FALSE;
+  DrawGUI();
+
+  return orig_eglSwapBuffers(display, surface);
 }
 
 

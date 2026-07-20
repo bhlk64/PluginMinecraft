@@ -6,6 +6,9 @@
 
 void DrawGUI()
 {
+  LOGI("DrawGUI called");
+  glClearColor(1,0,0,1);
+
   static bool initialized = false;
 
   if (!initialized) {
