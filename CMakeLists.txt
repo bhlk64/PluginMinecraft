@@ -16,8 +16,11 @@ target_include_directories(PluginMinecraft PRIVATE
 
 target_link_libraries(PluginMinecraft
     log
+    android
     EGL
     GLESv2
+    GLESv3
+    dl
 )
 
 target_compile_features(PluginMinecraft PRIVATE cxx_std_20)
