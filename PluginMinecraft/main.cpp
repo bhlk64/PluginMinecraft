@@ -1,7 +1,7 @@
 #include <android/log.h>
-#include <dobby.h>
 #include <EGL/egl.h>
 
+#include "shadowhook.h"
 #include "gui.h"
 
 #define LOG_TAG "PluginMinecraft"
@@ -15,6 +15,7 @@ typedef EGLBoolean (*eglSwapBuffers_t)(
 
 
 static eglSwapBuffers_t orig_eglSwapBuffers = nullptr;
+static void *eglSwapBuffers_stub = nullptr;
 
 
 EGLBoolean hook_eglSwapBuffers(
@@ -41,20 +42,35 @@ static void init()
 {
   LOGI("libplugin.so loaded!");
 
-  void* addr = DobbySymbolResolver(
+  shadowhook_init(
+    SHADOWHOOK_MODE_UNIQUE,
+    false
+  );
+
+
+  void *addr = shadowhook_dlsym(
     "libEGL.so",
     "eglSwapBuffers"
   );
 
+
   if (addr)
   {
-    DobbyHook(
+    eglSwapBuffers_stub = shadowhook_hook_func_addr(
       addr,
-      (void*)hook_eglSwapBuffers,
-      (void**)&orig_eglSwapBuffers
+      (void *)hook_eglSwapBuffers,
+      (void **)&orig_eglSwapBuffers
     );
 
-    LOGI("eglSwapBuffers hooked!");
+
+    if (eglSwapBuffers_stub)
+    {
+      LOGI("eglSwapBuffers hooked!");
+    }
+    else
+    {
+      LOGI("hook failed");
+    }
   }
   else
   {
