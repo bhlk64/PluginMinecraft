@@ -18,7 +18,7 @@ void DrawGUI()
     if (eglGetCurrentContext() != EGL_NO_CONTEXT) {
       ImGui::CreateContext();
   
-      ImGui_ImplOpenGL3_Init( "#version 300 es");
+      bool ok = ImGui_ImplOpenGL3_Init( "#version 300 es");
       LOGI("Init = %d", ok);
       
   
