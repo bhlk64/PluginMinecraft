@@ -32,7 +32,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install NDK
-        run: sdkmanager "ndk;27.2.12479018"
+        run: sdkmanager "ndk;26.3.11579264"
 
       - name: Configure CMake
         run: |
