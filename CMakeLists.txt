@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.22)
 
 project(PluginMinecraft)
 set(BUILD_WITH_TRAMPOLINE_ASM OFF CACHE BOOL "" FORCE)
-
 add_subdirectory(Dobby)
+set(BUILD_WITH_TRAMPOLINE_ASM OFF CACHE BOOL "" FORCE)
+
 file(GLOB imguis "imgui/*.cpp")
 
 add_library(PluginMinecraft SHARED
