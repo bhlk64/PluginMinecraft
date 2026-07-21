@@ -31,7 +31,7 @@ EGLBoolean hook_eglSwapBuffers(
     LOGI("eglSwapBuffers frame");
   }
 
-  DrawGUI();
+  DrawGUIS();
 
   return orig_eglSwapBuffers(display, surface);
 }
@@ -110,13 +110,13 @@ Java_com_mojang_minecraftpe_imgui_onTouch(
             break;
     }
 
-    LOGI(
+    /*LOGI(
         "Touch: action=%d x=%.1f y=%.1f down=%d",
         action,
         x,
         y,
         io.MouseDown[0]
-    );
+    );*/
 }
 
 __attribute__((constructor))

@@ -4,10 +4,12 @@ project(PluginMinecraft)
 
 file(GLOB imguis "imgui/*.cpp")
 file(GLOB mains "PluginMinecraft/*.cpp")
+file(GLOB guis "PluginMinecraft/Gui/*.cpp")
 
 add_library(PluginMinecraft SHARED
     ${mains}
     ${imguis}
+    ${guis}
 )
 
 target_include_directories(PluginMinecraft PRIVATE

@@ -2,12 +2,15 @@
 #include <EGL/egl.h>
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
-#include "android/log.h"
 #include <GLES3/gl3.h>
+
+#include "explorer.h"
+
+#include "android/log.h"
 #define LOG_TAG "PluginMinecraft"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
-void DrawGUI()
+void DrawGUIS()
 {
   //LOGI("DrawGUI called");
 
@@ -20,7 +23,8 @@ void DrawGUI()
   
       bool ok = ImGui_ImplOpenGL3_Init( "#version 300 es");
       LOGI("Init = %d", ok);
-      
+      ImGuiIO& io = ImGui::GetIO();
+      io.Fonts->AddFontDefault();
   
       initialized = true;
     }
@@ -33,9 +37,8 @@ void DrawGUI()
   eglQuerySurface(dpy, surf, EGL_WIDTH, &w);
   eglQuerySurface(dpy, surf, EGL_HEIGHT, &h);
   
-  ImGuiIO& io = ImGui::GetIO();
   io.DisplaySize = ImVec2((float)w, (float)h);
-  io.Fonts->AddFontDefault();
+  
   
   //LOGI("Display = %d %d", w, h);
   ImGui_ImplOpenGL3_NewFrame();
@@ -43,24 +46,7 @@ void DrawGUI()
   ImGui::NewFrame();
 
 
-  ImGui::Begin(
-    "PluginMinecraft"
-  );
-
-  ImGui::Text(
-    "Hello Minecraft"
-  );
-
-
-  if (ImGui::Button(
-    "Click me"
-  ))
-  {
-    ImGui::Text("nice");
-  }
-
-
-  ImGui::End();
+  DrawFileExplorer()b
 
 
   ImGui::Render();
