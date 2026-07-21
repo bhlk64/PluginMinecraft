@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include <GLES3/gl3.h>
+#include <chrono>
 
 #include "explorer.h"
 
@@ -44,6 +45,15 @@ void DrawGUIS()
   
   //LOGI("Display = %d %d", w, h);
   ImGui_ImplOpenGL3_NewFrame();
+  static auto last = std::chrono::steady_clock::now();
+  auto now = std::chrono::steady_clock::now();
+  
+  io.DeltaTime = std::chrono::duration<float>(now - last).count();
+  
+  if (io.DeltaTime <= 0.0f)
+      io.DeltaTime = 1.0f / 60.0f;
+
+last = now;
 
   ImGui::NewFrame();
 

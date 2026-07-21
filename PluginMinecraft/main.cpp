@@ -43,11 +43,9 @@ Java_com_mojang_minecraftpe_imgui_onTouch(
     jclass,
     jobject motionEvent)
 {
-    // ImGui chưa khởi tạo thì bỏ qua
     if (ImGui::GetCurrentContext() == nullptr)
         return;
 
-    // Cache class + method ID
     static jclass cls = nullptr;
     static jmethodID midGetActionMasked = nullptr;
     static jmethodID midGetX = nullptr;
@@ -55,68 +53,34 @@ Java_com_mojang_minecraftpe_imgui_onTouch(
 
     if (!cls)
     {
-        cls = (jclass)env->NewGlobalRef(env->GetObjectClass(motionEvent));
+        jclass local = env->GetObjectClass(motionEvent);
+        cls = (jclass)env->NewGlobalRef(local);
+        env->DeleteLocalRef(local);
 
-        midGetActionMasked = env->GetMethodID(
-            cls,
-            "getActionMasked",
-            "()I"
-        );
-
-        midGetX = env->GetMethodID(
-            cls,
-            "getX",
-            "()F"
-        );
-
-        midGetY = env->GetMethodID(
-            cls,
-            "getY",
-            "()F"
-        );
+        midGetActionMasked = env->GetMethodID(cls, "getActionMasked", "()I");
+        midGetX            = env->GetMethodID(cls, "getX", "()F");
+        midGetY            = env->GetMethodID(cls, "getY", "()F");
     }
 
-    const jint action = env->CallIntMethod(
-        motionEvent,
-        midGetActionMasked
-    );
-
-    const jfloat x = env->CallFloatMethod(
-        motionEvent,
-        midGetX
-    );
-
-    const jfloat y = env->CallFloatMethod(
-        motionEvent,
-        midGetY
-    );
+    const int action = env->CallIntMethod(motionEvent, midGetActionMasked);
+    const float x    = env->CallFloatMethod(motionEvent, midGetX);
+    const float y    = env->CallFloatMethod(motionEvent, midGetY);
 
     ImGuiIO& io = ImGui::GetIO();
 
-    io.MousePos = ImVec2(x, y);
+    io.AddMousePosEvent(x, y);
 
     switch (action)
     {
         case 0: // ACTION_DOWN
-            io.MouseDown[0] = true;
+            io.AddMouseButtonEvent(0, true);
             break;
 
         case 1: // ACTION_UP
         case 3: // ACTION_CANCEL
-            io.MouseDown[0] = false;
-            break;
-
-        case 2: // ACTION_MOVE
+            io.AddMouseButtonEvent(0, false);
             break;
     }
-
-    /*LOGI(
-        "Touch: action=%d x=%.1f y=%.1f down=%d",
-        action,
-        x,
-        y,
-        io.MouseDown[0]
-    );*/
 }
 
 __attribute__((constructor))

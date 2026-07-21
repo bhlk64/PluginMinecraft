@@ -108,15 +108,14 @@ void DrawFileExplorer()
 
             bool selected = (selectedFile == full);
 
-            if (ImGui::Selectable(label.c_str(), selected))
-            {
-                selectedFile = full;
+            bool clicked = ImGui::Selectable(label.c_str(), selected);
 
-                if (f.isDir &&
-                    ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-                {
-                    currentPath = full;
-                }
+            if (clicked)
+                selectedFile = full;
+            
+            if (f.isDir && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+            {
+                currentPath = full;
             }
         }
     }
