@@ -15,7 +15,8 @@ void DrawGUIS()
   //LOGI("DrawGUI called");
 
   static bool initialized = false;
-  LOGI("%s", glGetString(GL_VERSION));
+  //LOGI("%s", glGetString(GL_VERSION));
+  ImGuiIO& io = ImGui::GetIO();
 
   if (!initialized) {
     if (eglGetCurrentContext() != EGL_NO_CONTEXT) {
@@ -23,7 +24,6 @@ void DrawGUIS()
   
       bool ok = ImGui_ImplOpenGL3_Init( "#version 300 es");
       LOGI("Init = %d", ok);
-      ImGuiIO& io = ImGui::GetIO();
       io.Fonts->AddFontDefault();
   
       initialized = true;
