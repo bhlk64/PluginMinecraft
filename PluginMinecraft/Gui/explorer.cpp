@@ -1,10 +1,15 @@
 #include <dirent.h>
 #include <sys/stat.h>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <algorithm>
 
+#include "imgui.h"
+#include "explorer.h"
+
 static std::string currentPath = "/data/data/com.mojang.minecraftpe";
+static std::string selectedFile;
 
 struct Entry
 {
@@ -20,9 +25,12 @@ void DrawFileExplorer()
 
     if (currentPath != "/")
     {
-        if (ImGui::Button(".."))
+        ImGui::SameLine();
+
+        if (ImGui::Button("Up"))
         {
             size_t pos = currentPath.find_last_of('/');
+
             if (pos == 0)
                 currentPath = "/";
             else
@@ -30,26 +38,46 @@ void DrawFileExplorer()
         }
     }
 
+    ImGui::Separator();
+
+    ImGui::BeginChild("Files");
+
     std::vector<Entry> files;
 
     DIR* dir = opendir(currentPath.c_str());
 
-    if (dir)
+    if (!dir)
+    {
+        ImGui::TextColored(
+            ImVec4(1.f, 0.f, 0.f, 1.f),
+            "Cannot open directory."
+        );
+    }
+    else
     {
         dirent* ent;
 
-        while ((ent = readdir(dir)))
+        while ((ent = readdir(dir)) != nullptr)
         {
-            if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, ".."))
+            if (!strcmp(ent->d_name, ".") ||
+                !strcmp(ent->d_name, ".."))
                 continue;
 
             std::string full = currentPath + "/" + ent->d_name;
 
-            struct stat st{};
             bool isDir = false;
 
-            if (stat(full.c_str(), &st) == 0)
-                isDir = S_ISDIR(st.st_mode);
+            if (ent->d_type == DT_DIR)
+            {
+                isDir = true;
+            }
+            else if (ent->d_type == DT_UNKNOWN)
+            {
+                struct stat st{};
+
+                if (stat(full.c_str(), &st) == 0)
+                    isDir = S_ISDIR(st.st_mode);
+            }
 
             files.push_back({
                 ent->d_name,
@@ -58,37 +86,59 @@ void DrawFileExplorer()
         }
 
         closedir(dir);
-    }
 
-    std::sort(files.begin(), files.end(),
-        [](const Entry& a, const Entry& b)
-        {
-            if (a.isDir != b.isDir)
-                return a.isDir > b.isDir;
-
-            return a.name < b.name;
-        });
-
-    for (auto& f : files)
-    {
-        std::string label = f.isDir
-            ? "[DIR] " + f.name
-            : f.name;
-
-        if (ImGui::Selectable(label.c_str()))
-        {
-            if (f.isDir)
+        std::sort(
+            files.begin(),
+            files.end(),
+            [](const Entry& a, const Entry& b)
             {
-                if (currentPath == "/")
-                    currentPath += f.name;
-                else
-                    currentPath += "/" + f.name;
+                if (a.isDir != b.isDir)
+                    return a.isDir > b.isDir;
+
+                return a.name < b.name;
             }
-            else
+        );
+
+        for (const auto& f : files)
+        {
+            std::string full = currentPath + "/" + f.name;
+
+            std::string label =
+                (f.isDir ? "📁 " : "📄 ") + f.name;
+
+            bool selected = (selectedFile == full);
+
+            if (ImGui::Selectable(label.c_str(), selected))
             {
-                ImGui::OpenPopup("File");
+                selectedFile = full;
+
+                if (f.isDir &&
+                    ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                {
+                    currentPath = full;
+                }
             }
         }
+    }
+
+    ImGui::EndChild();
+
+    if (ImGui::BeginPopup("File"))
+    {
+        ImGui::Text("%s", selectedFile.c_str());
+
+        if (ImGui::Button("Copy Path"))
+        {
+            ImGui::SetClipboardText(selectedFile.c_str());
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
+        !selectedFile.empty())
+    {
+        ImGui::OpenPopup("File");
     }
 
     ImGui::End();
