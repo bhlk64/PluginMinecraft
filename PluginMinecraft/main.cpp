@@ -3,7 +3,7 @@
 #include <dlfcn.h>
 #include <jni.h>
 #include "And64InlineHook.hpp"
-#include "gui.h"
+#include "Gui/gui.h"
 #include "imgui.h"
 
 #define LOG_TAG "PluginMinecraft"
