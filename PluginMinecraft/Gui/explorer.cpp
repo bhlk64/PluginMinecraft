@@ -8,7 +8,7 @@
 #include "imgui.h"
 #include "explorer.h"
 
-static std::string currentPath = "/data/data/com.mojang.minecraftpe";
+static std::string currentPath = "/data/data/com.mojang.minecraftpe.roblox";
 static std::string selectedFile;
 
 struct Entry
